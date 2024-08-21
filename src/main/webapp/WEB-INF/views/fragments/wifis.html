@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://ultraq.net.nz/thymeleaf/layout">
+<section class="main" th:fragment="wifisSection(region, wifis)">
+	<h3
+		th:text="${searchKeyword != null ? searchKeyword + ' 검색 정보' : installationProvince + ' ' + installationCityCounty + ' WiFi 정보'}"></h3>
+	<div class="table-container">
+		<table class="list">
+			<thead>
+				<tr>
+					<th>설치 장소명</th>
+					<th>WiFi SSID</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="wifi : ${wifis}"
+					th:attr="data-lat=${wifi.latitude}, data-lng=${wifi.longitude}">
+					<td th:text="${wifi.installationPlaceName}"></td>
+					<td th:text="${wifi.wifiSSID}"></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</section>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://ultraq.net.nz/thymeleaf/layout">
+<section class="main">
+	<h3
+		th:text="${searchKeyword != null ? searchKeyword + ' 검색 정보' : region + ' 쓰레기통 정보'}"></h3>
+	<div class="table-container">
+		<div th:if="${noResults}">
+			<p>검색 결과가 없습니다.</p>
+		</div>
+		<table class="list" th:if="${not(noResults)}">
+			<thead>
+				<tr>
+					<th>위치</th>
+					<th>쓰레기통 종류</th>
+				</tr>
+			</thead>
+			<tbody id="trashCansTableBody">
+				<tr th:each="bin : ${trashCans}"
+					th:attr="data-lat=${bin.latitude}, data-lng=${bin.longitude}">
+					<td th:text="${bin.location}"></td>
+					<td th:text="${bin.binType}"></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</section>
+</html>

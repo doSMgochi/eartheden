@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://ultraq.net.nz/thymeleaf/layout">
+<section class="main" th:fragment="restroomsSection(region, restrooms)">
+	<h3
+		th:text="${searchKeyword != null ? searchKeyword + ' 검색 정보' : roadAddressPart1 + ' ' + roadAddressPart2 + ' 화장실 정보'}"></h3>
+	<div class="table-container">
+		<table class="list">
+			<thead>
+				<tr>
+					<th>화장실명</th>
+					<th>도로명 주소</th>
+					<th>지번 주소</th>
+					<th>개방시간</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="restroom : ${restrooms}"
+					th:attr="data-lat=${restroom.latitude}, data-lng=${restroom.longitude}">
+					<td th:text="${restroom.toiletName}"></td>
+					<td th:text="${restroom.roadAddress}"></td>
+					<td th:text="${restroom.parcelAddress}"></td>
+					<td th:text="${restroom.openHours}"></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</section>
+</html>
