@@ -31,16 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "송파구",
       "강동구",
     ],
-    대구: [
-      "중구",
-      "동구",
-      "서구",
-      "남구",
-      "북구",
-      "수성구",
-      "달서구",
-      "달성군",
-    ],
+    대구: ["중구", "동구", "서구", "남구", "북구", "수성구", "달서구", "달성군"],
     부산: [
       "중구",
       "서구",
@@ -61,18 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ],
     대전: ["동구", "중구", "서구", "유성구", "대덕구"],
     광주: ["동구", "서구", "남구", "북구", "광산구"],
-    인천: [
-      "중구",
-      "동구",
-      "미추홀구",
-      "연수구",
-      "남동구",
-      "부평구",
-      "계양구",
-      "서구",
-      "강화군",
-      "옹진군",
-    ],
+    인천: ["중구", "동구", "미추홀구", "연수구", "남동구", "부평구", "계양구", "서구", "강화군", "옹진군"],
     강원: [
       "춘천시",
       "원주시",
@@ -228,19 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "예산군",
       "태안군",
     ],
-    충북: [
-      "청주시",
-      "충주시",
-      "제천시",
-      "보은군",
-      "옥천군",
-      "영동군",
-      "증평군",
-      "진천군",
-      "괴산군",
-      "음성군",
-      "단양군",
-    ],
+    충북: ["청주시", "충주시", "제천시", "보은군", "옥천군", "영동군", "증평군", "진천군", "괴산군", "음성군", "단양군"],
   };
   const mapContainer = document.createElement("div");
   mapContainer.style.width = "250px";
@@ -253,7 +221,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let map = null;
   let marker = null;
 
-  function showMap(row, event) {
+  const showMap = (row, event) => {
     const lat = parseFloat(row.getAttribute("data-lat"));
     const lng = parseFloat(row.getAttribute("data-lng"));
 
@@ -284,13 +252,12 @@ document.addEventListener("DOMContentLoaded", () => {
         kakao.maps.event.trigger(map, "resize");
       }, 100);
     }
-  }
+  };
 
-  function hideMap() {
+  const hideMap = () => {
     mapContainer.style.display = "none";
-  }
+  };
 
-  // Event Delegation으로 모든 페이지에서 지도가 나타나도록 처리
   document.addEventListener("mouseover", (event) => {
     const target = event.target.closest("tr[data-lat][data-lng]");
     if (target) {
@@ -313,20 +280,36 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  document.addEventListener("click", (event) => {
+    const target = event.target.closest("tr[data-lat][data-lng]");
+    if (target) {
+      const lat = parseFloat(target.getAttribute("data-lat"));
+      const lng = parseFloat(target.getAttribute("data-lng"));
+
+      if (!isNaN(lat) && !isNaN(lng)) {
+        // 카카오 지도 URL 생성
+        const kakaoMapUrl = `https://map.kakao.com/link/map/${lat},${lng}`;
+
+        // 새 창으로 카카오 지도 열기
+        window.open(kakaoMapUrl, "_blank");
+      }
+    }
+  });
+
   // 커스텀 셀렉트박스
-  document.querySelectorAll(".custom-select").forEach(function (selectElement) {
+  document.querySelectorAll(".custom-select").forEach((selectElement) => {
     const trigger = selectElement.querySelector(".custom-select-trigger");
     const optionsContainer = selectElement.querySelector(".custom-options");
     const options = selectElement.querySelectorAll(".custom-option");
     const hiddenSelect = selectElement.nextElementSibling;
 
     // 셀렉트박스 열기
-    trigger.addEventListener("click", function () {
+    trigger.addEventListener("click", () => {
       selectElement.classList.toggle("open");
     });
 
-    options.forEach(function (option) {
-      option.addEventListener("click", function () {
+    options.forEach((option) => {
+      option.addEventListener("click", () => {
         trigger.querySelector("span").textContent = option.textContent;
 
         hiddenSelect.value = option.getAttribute("data-value");
@@ -340,24 +323,20 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // 셀렉트박스 닫기
-  window.addEventListener("click", function (e) {
-    document
-      .querySelectorAll(".custom-select")
-      .forEach(function (selectElement) {
-        if (!selectElement.contains(e.target)) {
-          selectElement.classList.remove("open");
-        }
-      });
+  window.addEventListener("click", (e) => {
+    document.querySelectorAll(".custom-select").forEach((selectElement) => {
+      if (!selectElement.contains(e.target)) {
+        selectElement.classList.remove("open");
+      }
+    });
   });
 
-  document.addEventListener("click", function (event) {
+  document.addEventListener("click", (event) => {
     const isOption = event.target.classList.contains("custom-option");
     const selectWrapper = event.target.closest(".custom-select");
 
     if (isOption && selectWrapper) {
-      const triggerSpan = selectWrapper.querySelector(
-        ".custom-select-trigger span"
-      );
+      const triggerSpan = selectWrapper.querySelector(".custom-select-trigger span");
       const hiddenSelect = selectWrapper.nextElementSibling;
 
       triggerSpan.textContent = event.target.textContent;
@@ -367,29 +346,41 @@ document.addEventListener("DOMContentLoaded", () => {
       selectWrapper.classList.remove("open");
     }
 
-    document
-      .querySelectorAll(".custom-select")
-      .forEach(function (selectElement) {
-        if (!selectElement.contains(event.target)) {
-          selectElement.classList.remove("open");
-        }
-      });
+    document.querySelectorAll(".custom-select").forEach((selectElement) => {
+      if (!selectElement.contains(event.target)) {
+        selectElement.classList.remove("open");
+      }
+    });
   });
 
+  // 스크롤 스냅
   const snapContainer = document.getElementById("snapContainer");
   const backgrounds = document.querySelectorAll(".background");
 
   let isScrolling = false;
 
-  snapContainer.addEventListener("wheel", (event) => {
-    if (isScrolling) return; // Prevents multiple scrolls at once
+  const disableScroll = () => {
+    snapContainer.addEventListener("wheel", preventScroll, { passive: false });
+  };
+
+  const enableScroll = () => {
+    snapContainer.removeEventListener("wheel", preventScroll);
+  };
+
+  const preventScroll = (event) => {
+    event.preventDefault();
+  };
+
+  const handleScroll = (event) => {
+    if (isScrolling) return;
+
+    disableScroll();
 
     event.preventDefault();
 
     const delta = event.deltaY;
     let targetIndex;
 
-    // Determine the current section
     for (let i = 0; i < backgrounds.length; i++) {
       const rect = backgrounds[i].getBoundingClientRect();
       if (rect.top >= 0 && rect.top < window.innerHeight) {
@@ -398,12 +389,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // Determine the next section based on the scroll direction
     if (delta > 0 && targetIndex < backgrounds.length - 1) {
-      // Scrolling down
       targetIndex++;
     } else if (delta < 0 && targetIndex > 0) {
-      // Scrolling up
       targetIndex--;
     }
 
@@ -411,37 +399,29 @@ document.addEventListener("DOMContentLoaded", () => {
       isScrolling = true;
       backgrounds[targetIndex].scrollIntoView({ behavior: "smooth" });
 
-      // Add a delay to prevent multiple scrolls from firing at once
       setTimeout(() => {
         isScrolling = false;
-      }, 3000); // Adjust this value for longer/shorter delay
+        enableScroll();
+      }, 500);
     }
-  });
+  };
+
+  snapContainer.addEventListener("wheel", handleScroll);
 
   // 시군구 옵션 업데이트
   const updateDistrictOptions = (citySelect, districtSelect, districts) => {
     const city = citySelect.value;
-    const customOptions =
-      districtSelect.previousElementSibling.querySelector(".custom-options");
-    const triggerSpan = districtSelect.previousElementSibling.querySelector(
-      ".custom-select-trigger span"
-    );
+    const customOptions = districtSelect.previousElementSibling.querySelector(".custom-options");
+    const triggerSpan = districtSelect.previousElementSibling.querySelector(".custom-select-trigger span");
 
     districtSelect.innerHTML = '<option value="">시군구 선택</option>';
     customOptions.innerHTML = "";
 
     if (city && districts[city]) {
-      const options = districts[city]
-        .map((district) => `<option value="${district}">${district}</option>`)
-        .join("");
+      const options = districts[city].map((district) => `<option value="${district}">${district}</option>`).join("");
       districtSelect.innerHTML += options;
 
-      const customOptionsHtml = districts[city]
-        .map(
-          (district) =>
-            `<span class="custom-option" data-value="${district}">${district}</span>`
-        )
-        .join("");
+      const customOptionsHtml = districts[city].map((district) => `<span class="custom-option" data-value="${district}">${district}</span>`).join("");
       customOptions.innerHTML += customOptionsHtml;
     } else {
       triggerSpan.textContent = "시군구 선택";
@@ -462,26 +442,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 쓰레기통 검색
   const trashcanCitySelect = document.getElementById("trashcanCitySelect");
-  const trashcanDistrictSelect = document.getElementById(
-    "trashcanDistrictSelect"
-  );
-  const trashcanCityDistrictSearchButton = document.getElementById(
-    "trashcanCityDistrictSearchButton"
-  );
+  const trashcanDistrictSelect = document.getElementById("trashcanDistrictSelect");
+  const trashcanCityDistrictSearchButton = document.getElementById("trashcanCityDistrictSearchButton");
   const trashcanSearchButton = document.getElementById("trashcanSearchButton");
   const trashcanSearchInput = document.getElementById("trashcanSearchInput");
   const trashcanModal = document.getElementById("trashcanModal");
-  const trashcanModalResultSection = document.getElementById(
-    "trashcanModalResultSection"
-  );
+  const trashcanModalResultSection = document.getElementById("trashcanModalResultSection");
   const trashcanCloseModal = trashcanModal.getElementsByClassName("close")[0];
 
   trashcanCitySelect.addEventListener("change", () => {
-    updateDistrictOptions(
-      trashcanCitySelect,
-      trashcanDistrictSelect,
-      districts
-    );
+    updateDistrictOptions(trashcanCitySelect, trashcanDistrictSelect, districts);
   });
 
   // 지역 검색
@@ -494,9 +464,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    let url = `${rootPathWithSlash}trashcan-search?region=${encodeURIComponent(
-      city + " " + district
-    )}`;
+    let url = `${rootPathWithSlash}trashcan-search?region=${encodeURIComponent(city + " " + district)}`;
 
     fetch(url)
       .then((response) => response.text())
@@ -506,8 +474,7 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .catch((error) => {
         console.error("Error fetching trashcan data:", error);
-        trashcanModalResultSection.innerHTML =
-          "<p>검색 중 오류가 발생했습니다. 다시 시도해 주세요.</p>";
+        trashcanModalResultSection.innerHTML = "<p>검색 중 오류가 발생했습니다. 다시 시도해 주세요.</p>";
         trashcanModal.style.display = "block";
       });
   });
@@ -521,9 +488,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    let url = `${rootPathWithSlash}trashcan-search?search=${encodeURIComponent(
-      query
-    )}`;
+    let url = `${rootPathWithSlash}trashcan-search?search=${encodeURIComponent(query)}`;
 
     fetch(url)
       .then((response) => response.text())
@@ -533,41 +498,26 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .catch((error) => {
         console.error("Error fetching trashcan data:", error);
-        trashcanModalResultSection.innerHTML =
-          "<p>검색 중 오류가 발생했습니다. 다시 시도해 주세요.</p>";
+        trashcanModalResultSection.innerHTML = "<p>검색 중 오류가 발생했습니다. 다시 시도해 주세요.</p>";
         trashcanModal.style.display = "block";
       });
   });
 
-  trashcanCloseModal.addEventListener("click", () =>
-    modalCloseHandler(trashcanModal)
-  );
-  window.addEventListener("click", (event) =>
-    modalOutsideClickHandler(event, trashcanModal)
-  );
+  trashcanCloseModal.addEventListener("click", () => modalCloseHandler(trashcanModal));
+  window.addEventListener("click", (event) => modalOutsideClickHandler(event, trashcanModal));
 
   // 화장실 검색
   const restroomCitySelect = document.getElementById("restroomCitySelect");
-  const restroomDistrictSelect = document.getElementById(
-    "restroomDistrictSelect"
-  );
-  const restroomCityDistrictSearchButton = document.getElementById(
-    "restroomCityDistrictSearchButton"
-  );
+  const restroomDistrictSelect = document.getElementById("restroomDistrictSelect");
+  const restroomCityDistrictSearchButton = document.getElementById("restroomCityDistrictSearchButton");
   const restroomSearchButton = document.getElementById("restroomSearchButton");
   const restroomSearchInput = document.getElementById("restroomSearchInput");
   const restroomModal = document.getElementById("restroomModal");
-  const restroomModalResultSection = document.getElementById(
-    "restroomModalResultSection"
-  );
+  const restroomModalResultSection = document.getElementById("restroomModalResultSection");
   const restroomCloseModal = restroomModal.getElementsByClassName("close")[0];
 
   restroomCitySelect.addEventListener("change", () => {
-    updateDistrictOptions(
-      restroomCitySelect,
-      restroomDistrictSelect,
-      districts
-    );
+    updateDistrictOptions(restroomCitySelect, restroomDistrictSelect, districts);
   });
 
   // 지역 검색
@@ -580,9 +530,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    let url = `${rootPathWithSlash}restroom-search?roadAddressPart1=${encodeURIComponent(
-      city
-    )}&roadAddressPart2=${encodeURIComponent(district)}`;
+    let url = `${rootPathWithSlash}restroom-search?roadAddressPart1=${encodeURIComponent(city)}&roadAddressPart2=${encodeURIComponent(district)}`;
 
     fetch(url)
       .then((response) => response.text())
@@ -592,8 +540,7 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .catch((error) => {
         console.error("Error fetching restroom data:", error);
-        restroomModalResultSection.innerHTML =
-          "<p>검색 중 오류가 발생했습니다. 다시 시도해 주세요.</p>";
+        restroomModalResultSection.innerHTML = "<p>검색 중 오류가 발생했습니다. 다시 시도해 주세요.</p>";
         restroomModal.style.display = "block";
       });
   });
@@ -607,9 +554,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    let url = `${rootPathWithSlash}restroom-search?search=${encodeURIComponent(
-      query
-    )}`;
+    let url = `${rootPathWithSlash}restroom-search?search=${encodeURIComponent(query)}`;
 
     fetch(url)
       .then((response) => response.text())
@@ -619,31 +564,22 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .catch((error) => {
         console.error("Error fetching restroom data:", error);
-        restroomModalResultSection.innerHTML =
-          "<p>검색 중 오류가 발생했습니다. 다시 시도해 주세요.</p>";
+        restroomModalResultSection.innerHTML = "<p>검색 중 오류가 발생했습니다. 다시 시도해 주세요.</p>";
         restroomModal.style.display = "block";
       });
   });
 
-  restroomCloseModal.addEventListener("click", () =>
-    modalCloseHandler(restroomModal)
-  );
-  window.addEventListener("click", (event) =>
-    modalOutsideClickHandler(event, restroomModal)
-  );
+  restroomCloseModal.addEventListener("click", () => modalCloseHandler(restroomModal));
+  window.addEventListener("click", (event) => modalOutsideClickHandler(event, restroomModal));
 
   // 와이파이 검색
   const wifiCitySelect = document.getElementById("wifiCitySelect");
   const wifiDistrictSelect = document.getElementById("wifiDistrictSelect");
-  const wifiCityDistrictSearchButton = document.getElementById(
-    "wifiCityDistrictSearchButton"
-  );
+  const wifiCityDistrictSearchButton = document.getElementById("wifiCityDistrictSearchButton");
   const wifiSearchButton = document.getElementById("wifiSearchButton");
   const wifiSearchInput = document.getElementById("wifiSearchInput");
   const wifiModal = document.getElementById("wifiModal");
-  const wifiModalResultSection = document.getElementById(
-    "wifiModalResultSection"
-  );
+  const wifiModalResultSection = document.getElementById("wifiModalResultSection");
   const wifiCloseModal = wifiModal.getElementsByClassName("close")[0];
 
   wifiCitySelect.addEventListener("change", () => {
@@ -660,9 +596,9 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    let url = `${rootPathWithSlash}wifi-search?installationProvince=${encodeURIComponent(
-      city
-    )}&installationCityCounty=${encodeURIComponent(district)}`;
+    let url = `${rootPathWithSlash}wifi-search?installationProvince=${encodeURIComponent(city)}&installationCityCounty=${encodeURIComponent(
+      district
+    )}`;
 
     fetch(url)
       .then((response) => response.text())
@@ -672,8 +608,7 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .catch((error) => {
         console.error("Error fetching wifi data:", error);
-        wifiModalResultSection.innerHTML =
-          "<p>검색 중 오류가 발생했습니다. 다시 시도해 주세요.</p>";
+        wifiModalResultSection.innerHTML = "<p>검색 중 오류가 발생했습니다. 다시 시도해 주세요.</p>";
         wifiModal.style.display = "block";
       });
   });
@@ -687,9 +622,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    let url = `${rootPathWithSlash}wifi-search?search=${encodeURIComponent(
-      query
-    )}`;
+    let url = `${rootPathWithSlash}wifi-search?search=${encodeURIComponent(query)}`;
 
     fetch(url)
       .then((response) => response.text())
@@ -699,21 +632,17 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .catch((error) => {
         console.error("Error fetching wifi data:", error);
-        wifiModalResultSection.innerHTML =
-          "<p>검색 중 오류가 발생했습니다. 다시 시도해 주세요.</p>";
+        wifiModalResultSection.innerHTML = "<p>검색 중 오류가 발생했습니다. 다시 시도해 주세요.</p>";
         wifiModal.style.display = "block";
       });
   });
 
   wifiCloseModal.addEventListener("click", () => modalCloseHandler(wifiModal));
-  window.addEventListener("click", (event) =>
-    modalOutsideClickHandler(event, wifiModal)
-  );
+  window.addEventListener("click", (event) => modalOutsideClickHandler(event, wifiModal));
 
-  document.addEventListener("scroll", function () {
+  document.addEventListener("scroll", () => {
     const scrollIcon = document.getElementById("scrollIcon");
-    const isLastPage =
-      window.innerHeight + window.scrollY >= document.body.offsetHeight;
+    const isLastPage = window.innerHeight + window.scrollY >= document.body.offsetHeight;
 
     if (isLastPage) {
       scrollIcon.classList.add("hidden");
